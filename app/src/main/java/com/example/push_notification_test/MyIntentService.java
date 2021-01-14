@@ -19,20 +19,34 @@ public class MyIntentService extends IntentService {
         super("MyIntentService");
     }
 
+    MediaPlayer mp;
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String s = "ANKUR";
-        Log.d(s,"onHandleIntent");
+        Log.d(ANKUR,"onHandleIntent");
 
         //when activity not running
         //startForeground(1002,sendAudioNotification());
-
+        //String flag=null;
         if (intent != null) {
-            MediaPlayer mp=MediaPlayer.create(this, R.raw.b);
-            mp.start();
+            /*if(intent.hasExtra(MyMessagingService.MYFLAG)){
+                flag=intent.getStringExtra(MyMessagingService.MYFLAG);
+            }
+            Log.d(ANKUR,flag);*/
 
+            if(MyMessagingService.flag==1){
+                Log.d(ANKUR,"PLAY");
+                MyMessagingService.flag=0;
+                mp=MediaPlayer.create(this, R.raw.b);
+                mp.start();
+            }
+            else{
+                Log.d(ANKUR,"PAUSE");
+                MyMessagingService.flag=1;
+                mp.pause();
+            }
         }
+
     }
 
     public Notification sendAudioNotification(){

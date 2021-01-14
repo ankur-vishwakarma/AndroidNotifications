@@ -22,7 +22,9 @@ import org.w3c.dom.DOMImplementationList;
 public class MyMessagingService extends FirebaseMessagingService {
 
 
+    public static final String MYFLAG = "MYFLAG";
     private static final String M ="ANKUR" ;
+    static int flag=1;
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -56,7 +58,7 @@ public class MyMessagingService extends FirebaseMessagingService {
 */
         Log.d(M,"SENDAUDIONOTIFICATION");
         Intent serviceIntent = new Intent(this, MyIntentService.class);
-        //serviceIntent.putExtra(MYFLAG,"play");
+        //serviceIntent.putExtra("MYFLAG","play");
 
         PendingIntent servicePendingIntent = PendingIntent.getService(this,2,serviceIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -69,8 +71,8 @@ public class MyMessagingService extends FirebaseMessagingService {
                 .setContentTitle("music")
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentText("my music")
-                .addAction(R.drawable.play,"play",servicePendingIntent);
-                //.addAction(R.drawable.play,"pause",servicePendingIntentPause);
+                .addAction(R.drawable.play,"play",servicePendingIntent)
+                .addAction(R.drawable.play,"pause",servicePendingIntent);
 
 
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
