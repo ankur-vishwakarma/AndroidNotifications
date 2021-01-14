@@ -4,7 +4,9 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -19,12 +21,14 @@ public class MyIntentService extends IntentService {
         super("MyIntentService");
     }
 
-    MediaPlayer mp;
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(ANKUR,"onHandleIntent");
-
+        String url="https://www.android-examples.com/wp-content/uploads/2016/04/Thunder-rumble.mp3";
+        String url2="";
+        Uri uri = Uri.parse(url);
         //when activity not running
         //startForeground(1002,sendAudioNotification());
         //String flag=null;
@@ -37,13 +41,26 @@ public class MyIntentService extends IntentService {
             if(MyMessagingService.flag==1){
                 Log.d(ANKUR,"PLAY");
                 MyMessagingService.flag=0;
-                mp=MediaPlayer.create(this, R.raw.b);
-                mp.start();
+
+                //offline
+                //MyMessagingService.mp=MediaPlayer.create(this, R.raw.b);
+                //MyMessagingService.mp.start();
+
+                //link
+                try{
+                    MyMessagingService.mp=new MediaPlayer();
+                    MyMessagingService.mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    MyMessagingService.mp.setDataSource(this, uri);
+                    MyMessagingService.mp.prepare();
+                    MyMessagingService.mp.start();
+                }catch(Exception e) {
+                    System.out.println(e.toString());
+                }
             }
             else{
                 Log.d(ANKUR,"PAUSE");
                 MyMessagingService.flag=1;
-                mp.pause();
+                if(MyMessagingService.mp!=null) MyMessagingService.mp.pause();
             }
         }
 
@@ -75,6 +92,12 @@ public class MyIntentService extends IntentService {
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
         Notification notification= builder.build();
         return notification;
+    }
+
+
+    private void stopPlaying() {
+        MyMessagingService.mp.release();
+        MyMessagingService.mp = null;
     }
 
 

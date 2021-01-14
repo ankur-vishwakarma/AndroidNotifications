@@ -25,6 +25,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     public static final String MYFLAG = "MYFLAG";
     private static final String M ="ANKUR" ;
     static int flag=1;
+    static MediaPlayer mp;
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
