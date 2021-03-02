@@ -2,9 +2,14 @@ package com.example.push_notification_test;
 
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -19,13 +24,29 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import org.w3c.dom.DOMImplementationList;
 
-public class MyMessagingService extends FirebaseMessagingService {
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
+import static android.provider.CalendarContract.CalendarCache.URI;
+
+public class MyMessagingService extends FirebaseMessagingService {
 
     public static final String MYFLAG = "MYFLAG";
     private static final String M ="ANKUR" ;
     static int flag=1;
     static MediaPlayer mp;
+
+
+    //gif
+    Bitmap bitmap;
+    private static final int NOTIF_ID = 1234;
+    private NotificationCompat.Builder mBuilder;
+    private NotificationManager mNotificationManager;
+    private RemoteViews mRemoteViews;
+    private Notification mNotification;
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -41,9 +62,17 @@ public class MyMessagingService extends FirebaseMessagingService {
     */
         Log.d(M,"onMessageReceived");
 
+        //for payload
         if(remoteMessage.getData().size() > 0) {
             Log.d(M,"inside data handler of FCM");
             Log.d(M,"Data "+remoteMessage.getData().toString());
+
+            /*//extract image
+            String url = remoteMessage.getData().get("image");
+            bitmap = getBitmapfromUrl(url);
+
+            sendImageNotificationRemote(bitmap,url);*/
+
             sendAudioNotification();
         }
 
@@ -78,6 +107,35 @@ public class MyMessagingService extends FirebaseMessagingService {
 
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
         manager.notify(123, builder.build());
+    }
+
+    public void sendImageNotificationRemote(Bitmap bitmap,String url){
+        Log.d(M,"SEND IMAGE NOTIFICATION REMOTE VIEWS");
+
+        RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.textlayout);
+        RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.imagelayout);
+
+        //set image
+        notificationLayoutExpanded.setImageViewBitmap(13,bitmap);
+        //Uri uri = Uri.parse(url);
+        //notificationLayoutExpanded.setImageViewUri(123,uri);
+
+        Notification customNotification = new NotificationCompat.Builder(this, "MyNotifications")
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(notificationLayout)
+                .setCustomBigContentView(notificationLayoutExpanded)
+                .build();
+
+
+        NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+        manager.notify(123,customNotification);
+
+    }
+
+    public void showGifNotification(){
+        Log.d(M,"SEND GIF NOTIFICATION");
+
     }
 
 
@@ -118,6 +176,23 @@ public class MyMessagingService extends FirebaseMessagingService {
         manager.notify(123, builder.build());
     }
 
+    public Bitmap getBitmapfromUrl(String imageUrl) {
+        Log.d(M,"getBitmapfromUrl");
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream inputStream = connection.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
     @Override
     public void onNewToken(String token) {
         Log.d(M,token);
@@ -128,4 +203,7 @@ public class MyMessagingService extends FirebaseMessagingService {
    dp0AZzHSQLe8d6ayvmmYfd:APA91bH5-9Hzri9ttLnqIzHWox5Dq8ce7txQC-m4pbE9BHI6srJQ5dbc3EwRJ7ZdF4FFDigEGeWuSZqENrEipHs0Z3C2BhU5sIZrHL2saxGjOvfzQxBJw7MyLws50SQbE7UoTSsZUC_n
    *
    * */
+
+    //image
+    //https://cdn.pixabay.com/photo/2021/01/04/07/33/man-5886719_1280.jpg
 }
